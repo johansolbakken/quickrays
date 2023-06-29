@@ -43,6 +43,17 @@ Window {
                     renderer.render()
                 }
             }
+
+            CheckBox {
+                text: "Auto render"
+                checked: false
+                onCheckedChanged: {
+                    renderer.autoRender = checked
+                    if (checked) {
+                        renderer.render()
+                    }
+                }
+            }
         }
     }
 

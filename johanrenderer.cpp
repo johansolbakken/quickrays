@@ -16,7 +16,11 @@ void JohanRenderer::render() {
     auto start = std::chrono::high_resolution_clock::now();
     for (int y = 0; y < m_image->height(); ++y) {
         for (int x = 0; x < m_image->width(); ++x) {
-            m_image->setPixelColor(x, y, QColor(255, 0, 0));
+            auto random = uint32_t(rand());
+            auto r = 0xff & (random >> 0);
+            auto g = 0xff & (random >> 8);
+            auto b = 0xff & (random >> 16);
+            m_image->setPixelColor(x, y, QColor(r, g, b));
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -28,6 +32,9 @@ void JohanRenderer::render() {
 
 void JohanRenderer::paint(QPainter *painter) {
     painter->drawImage(0, 0, *m_image);
+    
+    if (m_autoRender)
+        render();
 }
 
 void JohanRenderer::handleSizeChanged() {
@@ -37,4 +44,16 @@ void JohanRenderer::handleSizeChanged() {
 
 double JohanRenderer::renderTime() const {
     return m_renderTime;
+}
+
+bool JohanRenderer::autoRender() const {
+    return m_autoRender;
+}
+
+void JohanRenderer::setAutoRender(bool autoRender) {
+    if (m_autoRender == autoRender)
+        return;
+
+    m_autoRender = autoRender;
+    emit autoRenderChanged();
 }
