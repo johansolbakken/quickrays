@@ -13,7 +13,8 @@ qt_add_executable(appQuickRays3
 )
 
 target_include_directories(appQuickRays3
-    PRIVATE src)
+    PRIVATE src
+    PUBLIC vendor/glm)
 
 qt_add_qml_module(appQuickRays3
     URI QuickRays3
