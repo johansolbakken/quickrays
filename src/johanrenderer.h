@@ -5,6 +5,8 @@
 #include <QQuickPaintedItem>
 #include <QImage>
 
+#include "renderer.h"
+
 class JohanRenderer : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -35,6 +37,7 @@ private:
     double m_renderTime;
     bool m_autoRender;
 
+    Renderer m_renderer;
 };
 
 #endif // JOHANRENDERER_H

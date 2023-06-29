@@ -14,15 +14,19 @@ JohanRenderer::JohanRenderer(QQuickItem *parent)
 
 void JohanRenderer::render() {
     auto start = std::chrono::high_resolution_clock::now();
+    
+    // RENDERING
+    m_renderer.onResize(width(), height());
+    m_renderer.render();
+    auto* data = m_renderer.imageData();
     for (int y = 0; y < m_image->height(); ++y) {
         for (int x = 0; x < m_image->width(); ++x) {
-            auto random = uint32_t(rand());
-            auto r = 0xff & (random >> 0);
-            auto g = 0xff & (random >> 8);
-            auto b = 0xff & (random >> 16);
-            m_image->setPixelColor(x, y, QColor(r, g, b));
+            uint32_t color = data[y * m_image->width() + x];
+            m_image->setPixelColor(x, m_image->height() - y - 1, QColor::fromRgba(color));
         }
     }
+    // RENDERING
+
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
     m_renderTime = duration;

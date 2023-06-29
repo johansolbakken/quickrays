@@ -9,14 +9,18 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Quick)
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(appQuickRays3
-    main.cpp
+    src/main.cpp
 )
+
+target_include_directories(appQuickRays3
+    PRIVATE src)
 
 qt_add_qml_module(appQuickRays3
     URI QuickRays3
     VERSION 1.0
-    QML_FILES Main.qml
-    SOURCES johanrenderer.h johanrenderer.cpp
+    QML_FILES src/Main.qml
+    SOURCES src/johanrenderer.h src/johanrenderer.cpp
+            src/renderer.h src/renderer.cpp
 )
 
 set_target_properties(appQuickRays3 PROPERTIES

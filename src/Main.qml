@@ -6,8 +6,8 @@ import QtQuick.Shapes
 import QuickRays3
 
 Window {
-    width: 1920
-    height: 1080
+    width: 800
+    height: 400
     visible: true
     title: qsTr("Hello World")
     color: "black"
@@ -20,7 +20,7 @@ Window {
             Layout.fillWidth: true
 
             onRenderTimeChanged: {
-                renderTimeLabel.text = "Render time " + renderer.renderTime + "ms"
+                renderTimeLabel.text = "Render time " + renderer.renderTime + "ms (" + Math.floor(10000 / renderer.renderTime)/10 + "fps)"
             }
         }
 
@@ -56,5 +56,4 @@ Window {
             }
         }
     }
-
 }
