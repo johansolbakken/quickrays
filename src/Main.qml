@@ -6,8 +6,8 @@ import QtQuick.Shapes
 import QuickRays3
 
 Window {
-    width: 800
-    height: 400
+    width: 1600
+    height: 900
     visible: true
     title: qsTr("Hello World")
     color: "black"

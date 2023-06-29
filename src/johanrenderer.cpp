@@ -22,7 +22,10 @@ void JohanRenderer::render() {
     for (int y = 0; y < m_image->height(); ++y) {
         for (int x = 0; x < m_image->width(); ++x) {
             uint32_t color = data[y * m_image->width() + x];
-            m_image->setPixelColor(x, m_image->height() - y - 1, QColor::fromRgba(color));
+            auto r = (color >> 0) & 0xFF; // flipped
+            auto g = (color >> 8) & 0xFF;
+            auto b = (color >> 16) & 0xFF; // flipped :)
+            m_image->setPixelColor(x, m_image->height() - y - 1, QColor(r, g, b));
         }
     }
     // RENDERING

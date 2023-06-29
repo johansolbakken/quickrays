@@ -1,12 +1,16 @@
 #pragma once
 
 #include <cstdint>
+#include <glm/glm.hpp>
 
 class Renderer 
 {
 public:
     void onResize(uint32_t width, uint32_t height);
     void render();
+
+    glm::vec4 perPixel(glm::vec2 coord);
+
     uint32_t* imageData() const { return m_imageData; }
 
 private:
