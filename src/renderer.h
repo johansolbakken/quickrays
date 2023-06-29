@@ -3,13 +3,16 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 
+#include "camera.h"
+#include "ray.h"
+
 class Renderer 
 {
 public:
     void onResize(uint32_t width, uint32_t height);
-    void render();
+    void render(const Camera& camera);
 
-    glm::vec4 perPixel(glm::vec2 coord);
+    glm::vec4 traceRay(const Ray& ray);
 
     uint32_t* imageData() const { return m_imageData; }
 

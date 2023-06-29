@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     qmlRegisterType<JohanRenderer>("QuickRays3", 1, 0, "JohanRenderer");
+    qmlRegisterType<Camera>("QuickRays3", 1, 0, "Camera");
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed,
         &app, []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);

@@ -6,6 +6,7 @@
 #include <QImage>
 
 #include "renderer.h"
+#include "camera.h"
 
 class JohanRenderer : public QQuickPaintedItem
 {
@@ -13,6 +14,7 @@ class JohanRenderer : public QQuickPaintedItem
     QML_ELEMENT
     Q_PROPERTY(double renderTime READ renderTime NOTIFY renderTimeChanged)
     Q_PROPERTY(bool autoRender READ autoRender WRITE setAutoRender NOTIFY autoRenderChanged)
+    Q_PROPERTY(Camera* camera READ camera CONSTANT)
 public:
     explicit JohanRenderer(QQuickItem *parent = nullptr);
 
@@ -20,6 +22,8 @@ public:
 
     bool autoRender() const;
     void setAutoRender(bool autoRender);
+
+    Camera* camera() { return &m_camera; }
 
 protected:
     void paint(QPainter *painter) override;
@@ -38,6 +42,7 @@ private:
     bool m_autoRender;
 
     Renderer m_renderer;
+    Camera m_camera;
 };
 
 #endif // JOHANRENDERER_H
