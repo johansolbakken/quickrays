@@ -16,6 +16,7 @@ void JohanRenderer::render() {
     auto start = std::chrono::high_resolution_clock::now();
 
     // RENDERING
+    m_camera.OnUpdate(1.0);
     m_camera.OnResize(width(), height());
     m_renderer.onResize(width(), height());
     m_renderer.render(m_camera);

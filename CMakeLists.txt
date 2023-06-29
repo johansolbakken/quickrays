@@ -4,7 +4,7 @@ project(QuickRays3 VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Quick)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Quick QuickActionStore)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -36,6 +36,7 @@ set_target_properties(appQuickRays3 PROPERTIES
 
 target_link_libraries(appQuickRays3
     PRIVATE Qt6::Quick
+            Qt6::QuickActionStore
 )
 
 install(TARGETS appQuickRays3

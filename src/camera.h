@@ -6,6 +6,7 @@
 #include <vector>
 #include <QObject>
 #include <QQuickItem>
+#include <QString>
 
 class Camera : public QObject
 {
@@ -28,6 +29,9 @@ public:
 	const std::vector<glm::vec3>& GetRayDirections() const { return m_RayDirections; }
 
 	float GetRotationSpeed();
+
+public Q_SLOTS:
+    void handleActionTriggered(const QString &action);
 
 private:
 	void RecalculateProjection();
@@ -52,4 +56,17 @@ private:
 	glm::vec2 m_LastMousePosition{ 0.0f, 0.0f };
 
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+private:
+    enum class Direction {
+        None,
+        Forward,
+        Backward,
+        Left,
+        Right
+    };
+    Direction m_lookXDirection = Direction::None;
+    Direction m_lookYDirection = Direction::None;
+    Direction m_walkXDirection = Direction::None;
+    Direction m_walkYDirection = Direction::None;
 };
