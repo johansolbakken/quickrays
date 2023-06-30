@@ -17,6 +17,7 @@ class JohanRenderer : public QQuickPaintedItem
     Q_PROPERTY(bool autoRender READ autoRender WRITE setAutoRender NOTIFY autoRenderChanged)
     Q_PROPERTY(Camera* camera READ camera CONSTANT)
     Q_PROPERTY(uint32_t bounces READ bounces WRITE setBounces NOTIFY bouncesChanged)
+    Q_PROPERTY(bool accumulate READ accumulate WRITE setAccumulate NOTIFY accumulateChanged)
 public:
     explicit JohanRenderer(QQuickItem *parent = nullptr);
 
@@ -28,6 +29,9 @@ public:
     uint32_t bounces() const;
     void setBounces(uint32_t bounces);
 
+    bool accumulate() const;
+    void setAccumulate(bool accumulate);
+
     Camera* camera() { return &m_camera; }
 
 protected:
@@ -37,6 +41,7 @@ signals:
     void renderTimeChanged();
     void autoRenderChanged();
     void bouncesChanged();
+    void accumulateChanged();
 
 public slots:
     void render();

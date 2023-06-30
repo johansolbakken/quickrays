@@ -37,6 +37,8 @@ void Renderer::onResize(uint32_t width, uint32_t height)
     m_height = height;
     delete[] m_imageData;
     m_imageData = new uint32_t[width * height];
+    delete[] m_accumulationData;
+    m_accumulationData = new glm::vec4[width * height];
 }
 
 void Renderer::render(const Scene &scene, const Camera &camera)
@@ -47,15 +49,25 @@ void Renderer::render(const Scene &scene, const Camera &camera)
     m_activeScene = &scene;
     m_activeCamera = &camera;
 
+    if (m_frameIndex == 1)
+        memset(m_accumulationData, 0, m_width * m_height * sizeof(glm::vec4));
+
     for (int y = 0; y < m_height; ++y)
     {
         for (int x = 0; x < m_width; ++x)
         {
             auto color = perPixel(x, y);
-            color = glm::clamp(color, glm::vec4(0.0), glm::vec4(1.0));
-            m_imageData[y * m_width + x] = Utils::conertToRGBA(color);
+            m_accumulationData[y * m_width + x] += color;
+            glm::vec4 accumulatedColor = m_accumulationData[y * m_width + x] / (float)m_frameIndex;
+            accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0), glm::vec4(1.0));
+            m_imageData[y * m_width + x] = Utils::conertToRGBA(accumulatedColor);
         }
     }
+
+    if (m_settings.accumulate) 
+        m_frameIndex++;
+    else 
+        m_frameIndex = 1;
 }
 
 glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
@@ -67,7 +79,7 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
     glm::vec3 color(0.0);
     float multiplier = 1.0;
 
-    for (int i = 0; i < m_bounces; ++i)
+    for (int i = 0; i < m_settings.bounces; ++i)
     {
         auto payload = traceRay(ray);
         if (payload.objectIndex < 0) {

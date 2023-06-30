@@ -11,7 +11,7 @@ JohanRenderer::JohanRenderer(QQuickItem *parent)
     connect(this, &JohanRenderer::widthChanged, this, &JohanRenderer::handleSizeChanged);
     connect(this, &JohanRenderer::heightChanged, this, &JohanRenderer::handleSizeChanged);
 
-    m_scene.materials.push_back(Material{glm::vec3(31.0f/255, 1.0f,0.0f), 1.0f, 0.0f});
+    m_scene.materials.push_back(Material{glm::vec3(31.0f / 255, 1.0f, 0.0f), 1.0f, 0.0f});
     m_scene.materials.push_back(Material{glm::vec3(glm::vec3(51.0 / 255.0, 77.0 / 255.0, 1.0f)), 0.1f, 0.0f});
 
     m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0});
@@ -23,7 +23,8 @@ void JohanRenderer::render()
     auto start = std::chrono::high_resolution_clock::now();
 
     // RENDERING
-    m_camera.OnUpdate(1.0);
+    if (m_camera.OnUpdate(1.0))
+        m_renderer.resetFrameIndex();
     m_camera.OnResize(width(), height());
     m_renderer.onResize(width(), height());
     m_renderer.render(m_scene, m_camera);
@@ -84,14 +85,28 @@ void JohanRenderer::setAutoRender(bool autoRender)
 
 uint32_t JohanRenderer::bounces() const
 {
-    return m_renderer.bounces();
+    return m_renderer.settings().bounces;
 }
 
 void JohanRenderer::setBounces(uint32_t bounces)
 {
-    if (m_renderer.bounces() == bounces)
+    if (m_renderer.settings().bounces == bounces)
         return;
 
-    m_renderer.setBounces(bounces);
+    m_renderer.settings().bounces = bounces;
     emit bouncesChanged();
+}
+
+bool JohanRenderer::accumulate() const
+{
+    return m_renderer.settings().accumulate;
+}
+
+void JohanRenderer::setAccumulate(bool accumulate)
+{
+    if (m_renderer.settings().accumulate == accumulate)
+        return;
+
+    m_renderer.settings().accumulate = accumulate;
+    emit accumulateChanged();
 }

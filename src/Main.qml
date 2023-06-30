@@ -57,6 +57,14 @@ Window {
                 }
             }
 
+            CheckBox {
+                text: "Accumulate"
+                checked: true
+                onCheckedChanged: {
+                    renderer.accumulate = checked
+                }
+            }
+
             Label {
                 id: bounceLabel
                 text: "Bounces: " + bouncesSlider.value

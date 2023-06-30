@@ -120,7 +120,7 @@ bool Camera::OnUpdate(float ts = 1.0f)
 		RecalculateRayDirections();
 	}
     
-	return false;
+	return moved;
 }
 
 void Camera::handleActionTriggered(const QString &action)
