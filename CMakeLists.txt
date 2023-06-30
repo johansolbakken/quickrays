@@ -19,11 +19,12 @@ target_include_directories(appQuickRays3
 qt_add_qml_module(appQuickRays3
     URI QuickRays3
     VERSION 1.0
-    QML_FILES src/Main.qml
+    QML_FILES src/Main.qml 
     SOURCES src/johanrenderer.h src/johanrenderer.cpp
             src/renderer.h src/renderer.cpp
             src/camera.h src/camera.cpp
             src/ray.h src/ray.cpp
+            src/scene.h src/scene.cpp
 )
 
 set_target_properties(appQuickRays3 PROPERTIES

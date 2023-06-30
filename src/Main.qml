@@ -7,8 +7,8 @@ import QuickRays3
 import QtActionStore
 
 Window {
-    width: 1600
-    height: 900
+    width: 1000
+    height: 600
     visible: true
     title: qsTr("Hello World")
     color: "black"
@@ -56,6 +56,11 @@ Window {
                     }
                 }
             }
+
+            Label {
+                text: "Spheres"
+                font.pixelSize: 16
+            }
         }
     }
 
@@ -69,6 +74,10 @@ Window {
                 direction: JoyAxisEvent.Up
                 minVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_W
+                isPressed: true
+            }
         }
 
         InputAction {
@@ -77,6 +86,10 @@ Window {
                 axis: JoyAxisEvent.LeftY
                 direction: JoyAxisEvent.Down
                 minVal: 0.5
+            }
+            KeyEvent {
+                key: Qt.Key_S
+                isPressed: true
             }
         }
 
@@ -87,6 +100,10 @@ Window {
                 direction: JoyAxisEvent.Left
                 minVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_A
+                isPressed: true
+            }
         }
 
         InputAction {
@@ -95,6 +112,10 @@ Window {
                 axis: JoyAxisEvent.LeftX
                 direction: JoyAxisEvent.Right
                 minVal: 0.5
+            }
+            KeyEvent {
+                key: Qt.Key_D
+                isPressed: true
             }
         }
 
@@ -110,6 +131,14 @@ Window {
                 direction: JoyAxisEvent.Left
                 maxVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_A
+                isPressed: false
+            }
+            KeyEvent {
+                key: Qt.Key_D
+                isPressed: false
+            }
         }
 
         InputAction {
@@ -124,6 +153,14 @@ Window {
                 direction: JoyAxisEvent.Down
                 maxVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_W
+                isPressed: false
+            }
+            KeyEvent {
+                key: Qt.Key_S
+                isPressed: false
+            }
         }
 
         InputAction {
@@ -132,6 +169,10 @@ Window {
                 axis: JoyAxisEvent.RightY
                 direction: JoyAxisEvent.Up
                 minVal: 0.5
+            }
+            KeyEvent {
+                key: Qt.Key_Up
+                isPressed: true
             }
         }
 
@@ -142,6 +183,10 @@ Window {
                 direction: JoyAxisEvent.Down
                 minVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_Down
+                isPressed: true
+            }
         }
 
         InputAction {
@@ -151,6 +196,10 @@ Window {
                 direction: JoyAxisEvent.Left
                 minVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_Left
+                isPressed: true
+            }
         }
 
         InputAction {
@@ -159,6 +208,10 @@ Window {
                 axis: JoyAxisEvent.RightX
                 direction: JoyAxisEvent.Right
                 minVal: 0.5
+            }
+            KeyEvent {
+                key: Qt.Key_Right
+                isPressed: true
             }
         }
 
@@ -174,6 +227,14 @@ Window {
                 direction: JoyAxisEvent.Left
                 maxVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_Left
+                isPressed: false
+            }
+            KeyEvent {
+                key: Qt.Key_Right
+                isPressed: false
+            }
         }
 
         InputAction {
@@ -188,10 +249,23 @@ Window {
                 direction: JoyAxisEvent.Down
                 maxVal: 0.5
             }
+            KeyEvent {
+                key: Qt.Key_Up
+                isPressed: false
+            }
+            KeyEvent {
+                key: Qt.Key_Down
+                isPressed: false
+            }
         }
 
         onActionEvent: action => {
             renderer.camera.handleActionTriggered(action)
         }
+    }
+
+    ActionStoreEventListener {
+        actionStore: actionStore
+        focus: true
     }
 }

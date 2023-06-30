@@ -7,6 +7,7 @@
 
 #include "renderer.h"
 #include "camera.h"
+#include "scene.h"
 
 class JohanRenderer : public QQuickPaintedItem
 {
@@ -43,6 +44,7 @@ private:
 
     Renderer m_renderer;
     Camera m_camera;
+    Scene m_scene;
 };
 
 #endif // JOHANRENDERER_H

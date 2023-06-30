@@ -10,6 +10,9 @@ JohanRenderer::JohanRenderer(QQuickItem *parent)
     m_image = new QImage(width(), height(), QImage::Format_RGBA8888);
     connect(this, &JohanRenderer::widthChanged, this, &JohanRenderer::handleSizeChanged);
     connect(this, &JohanRenderer::heightChanged, this, &JohanRenderer::handleSizeChanged);
+
+    m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, glm::vec3(1.0f, 0.0f, 1.0f)});
+    m_scene.spheres.push_back(Sphere{glm::vec3(1.0f, 0.0f, -5.0f), 1.5f, glm::vec3(51.0/255.0, 77.0/255.0, 1.0f)});
 }
 
 void JohanRenderer::render() {
@@ -19,7 +22,7 @@ void JohanRenderer::render() {
     m_camera.OnUpdate(1.0);
     m_camera.OnResize(width(), height());
     m_renderer.onResize(width(), height());
-    m_renderer.render(m_camera);
+    m_renderer.render(m_scene, m_camera);
 
     auto* data = m_renderer.imageData();
     for (int y = 0; y < m_image->height(); ++y) {

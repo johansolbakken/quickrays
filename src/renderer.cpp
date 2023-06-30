@@ -25,50 +25,114 @@ void Renderer::onResize(uint32_t width, uint32_t height)
     m_imageData = new uint32_t[width * height];
 }
 
-void Renderer::render(const Camera &camera)
+void Renderer::render(const Scene &scene, const Camera &camera)
 {
-    auto rayOrigin = camera.GetPosition();
-    Ray ray;
-    ray.origin = rayOrigin;
+    if (m_width == 0 || m_height == 0)
+        return;
+
+    m_activeScene = &scene;
+    m_activeCamera = &camera;
 
     for (int y = 0; y < m_height; ++y)
     {
         for (int x = 0; x < m_width; ++x)
         {
-            auto rayDirection = camera.GetRayDirections()[x + y * m_width];
-            ray.direction = rayDirection;
-
-            auto color = traceRay(ray);
+            auto color = perPixel(x, y);
             color = glm::clamp(color, glm::vec4(0.0), glm::vec4(1.0));
             m_imageData[y * m_width + x] = Utils::conertToRGBA(color);
         }
     }
 }
 
-glm::vec4 Renderer::traceRay(const Ray& ray)
+glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 {
-    float radius = 0.5;
+    Ray ray;
+    ray.origin = m_activeCamera->GetPosition();
+    ray.direction = m_activeCamera->GetRayDirections()[x + y * m_width];
 
-    float a = glm::dot(ray.direction, ray.direction);
-    float b = 2.0 * glm::dot(ray.direction, ray.origin);
-    float c = glm::dot(ray.origin, ray.origin) - radius * radius;
+    glm::vec3 color(0.0);
+    float multiplier = 1.0;
 
-    float discriminant = b * b - 4.0 * a * c;
-    if (discriminant < 0.0)
-        return glm::vec4(0.0);
+    for (int i = 0; i < bounces; ++i)
+    {
+        auto payload = traceRay(ray);
+        if (payload.objectIndex < 0) {
+            glm::vec3 skyColor(0.0, 0.0, 0.0);
+            color += skyColor * multiplier;
+            break;
+        }
 
-    float t = (-b - sqrt(discriminant)) / (2.0 * a);
-    if (t < 0.0)
-        return glm::vec4(0.0);
+        glm::vec3 lightDirection = glm::normalize(glm::vec3(-1, -1, -1));
+        float lightIntensity = glm::dot(payload.worldNormal, -lightDirection);
+        if (lightIntensity < 0.0)
+            lightIntensity = 0.0;
 
-    glm::vec3 hitPoint = ray.origin + ray.direction * t;
-    glm::vec3 normal = glm::normalize(hitPoint);
-    glm::vec3 lightDirection = glm::normalize(glm::vec3(-1, -1, -1));
-    float lightIntensity = glm::dot(normal, -lightDirection);
-    if (lightIntensity < 0.0)
-        lightIntensity = 0.0;
+        auto &closestSphere = m_activeScene->spheres[payload.objectIndex];
+        auto sphereColor = closestSphere.albedo;
+        sphereColor *= lightIntensity;
+        color += sphereColor * multiplier;
 
-    auto sphereColor = glm::vec3(1, 0, 1);
-    sphereColor *= lightIntensity;
-    return glm::vec4(sphereColor, 1.0);
+        multiplier *= 0.7;
+
+        ray.origin = payload.worldPosition + payload.worldNormal * 0.001f;
+        ray.direction = glm::reflect(ray.direction, payload.worldNormal);
+    }
+
+    return glm::vec4(color, 1.0);
+}
+
+Renderer::HitPayload Renderer::traceRay(const Ray &ray)
+{
+    int closestSphere = -1;
+    float hitDistance = std::numeric_limits<float>::max();
+
+    for (uint32_t i = 0; i < m_activeScene->spheres.size(); ++i)
+    {
+        auto &sphere = m_activeScene->spheres[i];
+        glm::vec3 origin = ray.origin - sphere.position;
+
+        float a = glm::dot(ray.direction, ray.direction);
+        float b = 2.0 * glm::dot(ray.direction, origin);
+        float c = glm::dot(origin, origin) - sphere.radius * sphere.radius;
+
+        float discriminant = b * b - 4.0 * a * c;
+        if (discriminant < 0.0)
+            continue;
+
+        float closestT = (-b - sqrt(discriminant)) / (2.0 * a);
+        if (closestT > 0 && closestT < hitDistance)
+        {
+            hitDistance = closestT;
+            closestSphere = i;
+        }
+    }
+
+    if (closestSphere < 0)
+        return miss(ray);
+
+    return closestHit(ray, hitDistance, closestSphere);
+}
+
+Renderer::HitPayload Renderer::closestHit(const Ray &ray, float hitDistance, int objectIndex)
+{
+    HitPayload payload;
+    payload.hitDistance = hitDistance;
+    payload.objectIndex = objectIndex;
+
+    auto &closestSphere = m_activeScene->spheres[objectIndex];
+    auto origin = ray.origin - closestSphere.position; // move origin to sphere center
+    payload.worldPosition = origin + ray.direction * hitDistance;
+    payload.worldNormal = glm::normalize(payload.worldPosition);
+    payload.worldPosition += closestSphere.position; // move back to world space
+
+    return payload;
+}
+
+Renderer::HitPayload Renderer::miss(const Ray &ray)
+{
+    HitPayload payload;
+    payload.hitDistance = std::numeric_limits<float>::max();
+    payload.objectIndex = -1;
+
+    return payload;
 }
