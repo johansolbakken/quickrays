@@ -5,17 +5,21 @@
 #include <chrono>
 
 JohanRenderer::JohanRenderer(QQuickItem *parent)
-    : QQuickPaintedItem(parent), m_camera(45.0f, 0.1f, 100.0f)
+    : QQuickPaintedItem(parent), m_camera(45.0f, 0.1f, 100.0f), m_autoRender(true)
 {
     m_image = new QImage(width(), height(), QImage::Format_RGBA8888);
     connect(this, &JohanRenderer::widthChanged, this, &JohanRenderer::handleSizeChanged);
     connect(this, &JohanRenderer::heightChanged, this, &JohanRenderer::handleSizeChanged);
 
-    m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, glm::vec3(1.0f, 0.0f, 1.0f)});
-    m_scene.spheres.push_back(Sphere{glm::vec3(1.0f, 0.0f, -5.0f), 1.5f, glm::vec3(51.0/255.0, 77.0/255.0, 1.0f)});
+    m_scene.materials.push_back(Material{glm::vec3(31.0f/255, 1.0f,0.0f), 1.0f, 0.0f});
+    m_scene.materials.push_back(Material{glm::vec3(glm::vec3(51.0 / 255.0, 77.0 / 255.0, 1.0f)), 0.1f, 0.0f});
+
+    m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0});
+    m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, -101.0f, 0.0f), 100.0f, 1});
 }
 
-void JohanRenderer::render() {
+void JohanRenderer::render()
+{
     auto start = std::chrono::high_resolution_clock::now();
 
     // RENDERING
@@ -24,9 +28,11 @@ void JohanRenderer::render() {
     m_renderer.onResize(width(), height());
     m_renderer.render(m_scene, m_camera);
 
-    auto* data = m_renderer.imageData();
-    for (int y = 0; y < m_image->height(); ++y) {
-        for (int x = 0; x < m_image->width(); ++x) {
+    auto *data = m_renderer.imageData();
+    for (int y = 0; y < m_image->height(); ++y)
+    {
+        for (int x = 0; x < m_image->width(); ++x)
+        {
             uint32_t color = data[y * m_image->width() + x];
             auto r = (color >> 0) & 0xFF; // flipped
             auto g = (color >> 8) & 0xFF;
@@ -37,36 +43,55 @@ void JohanRenderer::render() {
     // RENDERING
 
     auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     m_renderTime = duration;
     emit renderTimeChanged();
     update();
 }
 
-void JohanRenderer::paint(QPainter *painter) {
+void JohanRenderer::paint(QPainter *painter)
+{
     painter->drawImage(0, 0, *m_image);
-    
+
     if (m_autoRender)
         render();
 }
 
-void JohanRenderer::handleSizeChanged() {
+void JohanRenderer::handleSizeChanged()
+{
     delete m_image;
     m_image = new QImage(width(), height(), QImage::Format_RGBA8888);
 }
 
-double JohanRenderer::renderTime() const {
+double JohanRenderer::renderTime() const
+{
     return m_renderTime;
 }
 
-bool JohanRenderer::autoRender() const {
+bool JohanRenderer::autoRender() const
+{
     return m_autoRender;
 }
 
-void JohanRenderer::setAutoRender(bool autoRender) {
+void JohanRenderer::setAutoRender(bool autoRender)
+{
     if (m_autoRender == autoRender)
         return;
 
     m_autoRender = autoRender;
     emit autoRenderChanged();
+}
+
+uint32_t JohanRenderer::bounces() const
+{
+    return m_renderer.bounces();
+}
+
+void JohanRenderer::setBounces(uint32_t bounces)
+{
+    if (m_renderer.bounces() == bounces)
+        return;
+
+    m_renderer.setBounces(bounces);
+    emit bouncesChanged();
 }

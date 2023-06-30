@@ -48,7 +48,7 @@ Window {
 
             CheckBox {
                 text: "Auto render"
-                checked: false
+                checked: true
                 onCheckedChanged: {
                     renderer.autoRender = checked
                     if (checked) {
@@ -56,6 +56,23 @@ Window {
                     }
                 }
             }
+
+            Label {
+                id: bounceLabel
+                text: "Bounces: " + bouncesSlider.value
+            }
+            Slider {
+                id: bouncesSlider
+                from: 0
+                to: 10
+                stepSize: 1
+                value: renderer.bounces
+                onValueChanged: {
+                    renderer.bounces = value
+                    bounceLabel.text = "Bounces: " + value
+                }
+            }
+
 
             Label {
                 text: "Spheres"

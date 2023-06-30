@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include <glm/glm.hpp>
+#include <random>
 
 namespace Utils
 {
@@ -12,6 +13,19 @@ namespace Utils
         auto a = (uint32_t)(color.a * 255.0f);
 
         return (a << 24) | (b << 16) | (g << 8) | r;
+    }
+
+    static auto generator = std::mt19937(std::random_device()());
+
+    static float randomFloat(float min = 0.0f, float max = 1.0f)
+    {
+        static auto distribution = std::uniform_real_distribution<float>(min, max);
+        return distribution(generator);
+    }
+
+    static glm::vec3 randomVec3(float min = 0.0f, float max = 1.0f)
+    {
+        return glm::vec3(randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
     }
 }
 
@@ -53,11 +67,11 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
     glm::vec3 color(0.0);
     float multiplier = 1.0;
 
-    for (int i = 0; i < bounces; ++i)
+    for (int i = 0; i < m_bounces; ++i)
     {
         auto payload = traceRay(ray);
         if (payload.objectIndex < 0) {
-            glm::vec3 skyColor(0.0, 0.0, 0.0);
+            glm::vec3 skyColor(0.6, 0.7, 0.9);
             color += skyColor * multiplier;
             break;
         }
@@ -68,14 +82,15 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
             lightIntensity = 0.0;
 
         auto &closestSphere = m_activeScene->spheres[payload.objectIndex];
-        auto sphereColor = closestSphere.albedo;
+        auto &material = m_activeScene->materials[closestSphere.materialIndex];
+        auto sphereColor = material.albedo;
         sphereColor *= lightIntensity;
         color += sphereColor * multiplier;
 
-        multiplier *= 0.7;
+        multiplier *= 0.5;
 
         ray.origin = payload.worldPosition + payload.worldNormal * 0.001f;
-        ray.direction = glm::reflect(ray.direction, payload.worldNormal);
+        ray.direction = glm::reflect(ray.direction, payload.worldNormal + Utils::randomVec3(-0.5, 0.5) * material.roughness);
     }
 
     return glm::vec4(color, 1.0);

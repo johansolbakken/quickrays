@@ -15,7 +15,8 @@ public:
 
     uint32_t* imageData() const { return m_imageData; }
 
-    void setBounces(uint32_t bounces) { this->bounces = bounces; }
+    void setBounces(uint32_t bounces) { m_bounces = bounces; }
+    uint32_t bounces() const { return m_bounces; }
 
 private:
     struct HitPayload {
@@ -24,6 +25,7 @@ private:
         glm::vec3 worldNormal;
         int objectIndex;
     };
+
     glm::vec4 perPixel(uint32_t x, uint32_t y); // RayGen
     HitPayload traceRay(const Ray& ray);
     HitPayload closestHit(const Ray& ray, float hitDistance, int objectIndex);
@@ -33,7 +35,7 @@ private:
     uint32_t m_width = 0;
     uint32_t m_height = 0;
     uint32_t* m_imageData = nullptr;
-    uint32_t bounces = 5;
+    uint32_t m_bounces = 2;
 
     const Scene* m_activeScene = nullptr;
     const Camera* m_activeCamera = nullptr;
