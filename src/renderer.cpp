@@ -19,11 +19,11 @@ namespace Utils
     }
 
     static auto generator = std::mt19937(std::random_device()());
+    static thread_local auto distribution = std::uniform_real_distribution<float>();
 
     static float randomFloat(float min = 0.0f, float max = 1.0f)
     {
-        static auto distribution = std::uniform_real_distribution<float>(min, max);
-        return distribution(generator);
+        return distribution(generator) * (max - min) + min;
     }
 
     static glm::vec3 randomVec3(float min = 0.0f, float max = 1.0f)
