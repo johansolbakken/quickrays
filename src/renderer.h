@@ -12,7 +12,7 @@ class Renderer
 public:
     struct Settings {
         bool accumulate = true;
-        uint32_t bounces = 2;
+        uint32_t bounces = 5;
         bool multiThreaded = false;
     };
 
