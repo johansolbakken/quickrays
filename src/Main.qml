@@ -65,6 +65,15 @@ Window {
                 }
             }
 
+
+            CheckBox {
+                text: "Multi-threaded"
+                checked: false
+                onCheckedChanged: {
+                    renderer.multiThreaded = checked
+                }
+            }
+
             Label {
                 id: bounceLabel
                 text: "Bounces: " + bouncesSlider.value

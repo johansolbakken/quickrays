@@ -110,3 +110,18 @@ void JohanRenderer::setAccumulate(bool accumulate)
     m_renderer.settings().accumulate = accumulate;
     emit accumulateChanged();
 }
+
+
+bool JohanRenderer::multiThreaded() const
+{   
+    return false;
+}
+
+void JohanRenderer::setMultiThreaded(bool multiThreaded)
+{
+    if (m_renderer.settings().multiThreaded == multiThreaded)
+        return;
+
+    m_renderer.settings().multiThreaded = multiThreaded;
+    emit multiThreadedChanged();
+}

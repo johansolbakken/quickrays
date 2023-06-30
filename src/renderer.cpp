@@ -2,6 +2,9 @@
 
 #include <glm/glm.hpp>
 #include <random>
+#include <algorithm>
+#include <QThread>
+#include <execution>
 
 namespace Utils
 {
@@ -39,6 +42,13 @@ void Renderer::onResize(uint32_t width, uint32_t height)
     m_imageData = new uint32_t[width * height];
     delete[] m_accumulationData;
     m_accumulationData = new glm::vec4[width * height];
+
+    m_imageHorizontalIter.resize(width);
+    m_imageVerticalIter.resize(height);
+    for (int i = 0; i < width; ++i)
+        m_imageHorizontalIter[i] = i;
+    for (int i = 0; i < height; ++i)
+        m_imageVerticalIter[i] = i;
 }
 
 void Renderer::render(const Scene &scene, const Camera &camera)
@@ -52,21 +62,45 @@ void Renderer::render(const Scene &scene, const Camera &camera)
     if (m_frameIndex == 1)
         memset(m_accumulationData, 0, m_width * m_height * sizeof(glm::vec4));
 
-    for (int y = 0; y < m_height; ++y)
+    if (m_settings.multiThreaded)
     {
-        for (int x = 0; x < m_width; ++x)
+        std::vector<std::thread> threads(m_height);
+        for (int y = 0; y < m_height; y++)
         {
-            auto color = perPixel(x, y);
-            m_accumulationData[y * m_width + x] += color;
-            glm::vec4 accumulatedColor = m_accumulationData[y * m_width + x] / (float)m_frameIndex;
-            accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0), glm::vec4(1.0));
-            m_imageData[y * m_width + x] = Utils::conertToRGBA(accumulatedColor);
+            threads[y] = std::thread([this, y]()
+                                     {
+                    for (int x = 0; x < m_width; x++) {
+                    auto color = perPixel(x, y);
+                    m_accumulationData[y * m_width + x] += color;
+                    glm::vec4 accumulatedColor = m_accumulationData[y * m_width + x] / (float)m_frameIndex;
+                    accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0), glm::vec4(1.0));
+                    m_imageData[y * m_width + x] = Utils::conertToRGBA(accumulatedColor);
+                    } });
+        }
+
+        for (auto &thread : threads)
+        {
+            thread.join();
+        }
+    }
+    else
+    {
+        for (int y = 0; y < m_height; ++y)
+        {
+            for (int x = 0; x < m_width; ++x)
+            {
+                auto color = perPixel(x, y);
+                m_accumulationData[y * m_width + x] += color;
+                glm::vec4 accumulatedColor = m_accumulationData[y * m_width + x] / (float)m_frameIndex;
+                accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0), glm::vec4(1.0));
+                m_imageData[y * m_width + x] = Utils::conertToRGBA(accumulatedColor);
+            }
         }
     }
 
-    if (m_settings.accumulate) 
+    if (m_settings.accumulate)
         m_frameIndex++;
-    else 
+    else
         m_frameIndex = 1;
 }
 
@@ -82,7 +116,8 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
     for (int i = 0; i < m_settings.bounces; ++i)
     {
         auto payload = traceRay(ray);
-        if (payload.objectIndex < 0) {
+        if (payload.objectIndex < 0)
+        {
             glm::vec3 skyColor(0.6, 0.7, 0.9);
             color += skyColor * multiplier;
             break;

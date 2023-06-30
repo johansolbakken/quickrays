@@ -13,6 +13,7 @@ public:
     struct Settings {
         bool accumulate = true;
         uint32_t bounces = 2;
+        bool multiThreaded = false;
     };
 
 public:
@@ -46,6 +47,8 @@ private:
     glm::vec4 *m_accumulationData = nullptr;
     uint32_t m_frameIndex = 1;
     Settings m_settings;
+
+    std::vector<uint32_t> m_imageHorizontalIter, m_imageVerticalIter;
 
     const Scene *m_activeScene = nullptr;
     const Camera *m_activeCamera = nullptr;
