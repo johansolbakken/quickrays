@@ -21,19 +21,24 @@ namespace Utils
     static auto generator = std::mt19937(std::random_device()());
     static thread_local auto distribution = std::uniform_real_distribution<float>();
 
-    static float randomFloat(float min = 0.0f, float max = 1.0f)
+    static uint32_t pcgHash(uint32_t input)
     {
-        return distribution(generator) * (max - min) + min;
+        uint32_t state = input * 747796405u + 2891336453u;
+        uint32_t word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+        return (word >> 22u) ^ word;
     }
 
-    static glm::vec3 randomVec3(float min = 0.0f, float max = 1.0f)
+    static float randomFloat(uint32_t &seed)
     {
-        return glm::vec3(randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
+        seed = pcgHash(seed);
+        return (float)seed / (float)std::numeric_limits<uint32_t>::max();
     }
 
-    static glm::vec3 inUnitSphere() {
-        return glm::normalize(randomVec3(-1.0f, 1.0f));
+    static glm::vec3 inUnitSphere(uint32_t &seed)
+    {
+        return glm::normalize(glm::vec3(randomFloat(seed) * 2.0f - 1.0, randomFloat(seed) * 2.0f - 1.0, randomFloat(seed) * 2.0f - 1.0));
     }
+
 }
 
 void Renderer::onResize(uint32_t width, uint32_t height)
@@ -116,11 +121,16 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
     ray.origin = m_activeCamera->GetPosition();
     ray.direction = m_activeCamera->GetRayDirections()[x + y * m_width];
 
+    uint32_t seed = x + y * m_width;
+    seed *= m_frameIndex;
+
     glm::vec3 light(0.0);
     glm::vec3 contribution(1.0);
 
     for (int i = 0; i < m_settings.bounces; ++i)
     {
+        seed += i;
+        
         auto payload = traceRay(ray);
         if (payload.objectIndex < 0)
         {
@@ -136,7 +146,7 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
         light += material.getEmission();
 
         ray.origin = payload.worldPosition + payload.worldNormal * 0.0001f;
-        ray.direction = glm::normalize(Utils::inUnitSphere() + payload.worldNormal);
+        ray.direction = glm::normalize(Utils::inUnitSphere(seed) + payload.worldNormal);
     }
 
     return glm::vec4(light, 1.0);

@@ -13,11 +13,11 @@ JohanRenderer::JohanRenderer(QQuickItem *parent)
 
     m_scene.materials.push_back(Material{glm::vec3(31.0f / 255, 1.0f, 0.0f), 1.0f, 0.0f});
     m_scene.materials.push_back(Material{glm::vec3(glm::vec3(51.0 / 255.0, 77.0 / 255.0, 1.0f)), 0.1f, 0.0f});
-    m_scene.materials.push_back(Material{glm::vec3(0.8f, 0.5f, 0.2f), 0.1f, 0.0f, 20.0f, glm::vec3(0.8f, 0.5f, 0.2f)});
+    m_scene.materials.push_back(Material{glm::vec3(0.8f, 0.5f, 0.2f), 0.1f, 0.0f, 2.0f, glm::vec3(0.8f, 0.5f, 0.2f)});
 
     m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0});
     m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, -101.0f, 0.0f), 100.0f, 1});
-    m_scene.spheres.push_back(Sphere{glm::vec3(32.0f, 4.0, -32.0), 20.0, 2});
+    m_scene.spheres.push_back(Sphere{glm::vec3(2.0f, 0.0, 0.0), 1.0, 2});
 }
 
 void JohanRenderer::render()
