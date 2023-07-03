@@ -11,9 +11,24 @@ JohanRenderer::JohanRenderer(QQuickItem *parent)
     connect(this, &JohanRenderer::widthChanged, this, &JohanRenderer::handleSizeChanged);
     connect(this, &JohanRenderer::heightChanged, this, &JohanRenderer::handleSizeChanged);
 
-    m_scene.materials.push_back(Material{glm::vec3(31.0f / 255, 1.0f, 0.0f), 1.0f, 0.0f});
-    m_scene.materials.push_back(Material{glm::vec3(glm::vec3(51.0 / 255.0, 77.0 / 255.0, 1.0f)), 0.1f, 0.0f});
-    m_scene.materials.push_back(Material{glm::vec3(0.8f, 0.5f, 0.2f), 0.1f, 0.0f, 2.0f, glm::vec3(0.8f, 0.5f, 0.2f)});
+    Material defaultMaterial;
+    defaultMaterial.albedo = {0.7f, 0.7f, 0.7f};
+    defaultMaterial.roughness = 1.0f;
+
+    Material green;
+    green.albedo = {31.0f / 255, 1.0f, 0.0f};
+
+    Material blue;
+    blue.albedo = {51.0 / 255.0, 77.0 / 255.0, 1.0f};
+    blue.roughness = 0.1f;
+
+    Material emissive;
+    emissive.albedo = {0.8f, 0.5f, 0.2f};
+    emissive.roughness = 0.0f;
+    emissive.emissionPower = 2.0f;
+    emissive.emissionColor = {0.8f, 0.5f, 0.2f};
+
+    m_scene.materials = {green, blue, emissive};
 
     m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0});
     m_scene.spheres.push_back(Sphere{glm::vec3(0.0f, -101.0f, 0.0f), 100.0f, 1});

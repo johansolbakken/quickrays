@@ -299,7 +299,7 @@ Window {
     }
 
     ActionStoreEventListener {
-        actionStore: actionStore
+        actionStores: [actionStore]
         focus: true
     }
 }
